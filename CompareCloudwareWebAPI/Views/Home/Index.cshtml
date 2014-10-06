@@ -1,0 +1,300 @@
+﻿<header>
+    <div class="content-wrapper">
+        <div class="float-left">
+            <p class="site-title">
+                <a href="~/">Compare Cloudware Web API</a>
+             </p>
+        </div>
+    </div>
+    <br />
+</header>
+<div xid="body" id="siteAnalyticsBody">
+@*    <ul id="siteAnalytics"></ul>*@
+    <div class="content-wrapper">
+@*    @Html.Label("Session ID : ", new { @style="width:200px;display:inline;" })*@
+@*    @Html.TextBox("SessionID", null, new { @style = "width:200px" })*@
+        <div class="site-analytics-screen">
+            <label>Vendor analytics to screen</label>
+            <br />
+            <label>Vendor: </label>
+            <select id="vendorsScreen"></select>    
+            <label>From: </label>
+            <input type="text" id="dateFromScreen" />
+            <label>To: </label>
+            <input type="text" id="dateToScreen" />
+            <input type="button" value="Fetch" onclick="getSiteAnalyticsVendorSummary();" />
+        </div>
+
+
+        <div class="site-analytics-excel">
+            <label>Vendor analytics to EXCEL</label>
+            <br />
+            <label>Vendor: </label>
+            <select id="vendorsExcel"></select>    
+            <label>From: </label>
+            <input type="text" id="dateFromExcel" />
+            <label>To: </label>
+            <input type="text" id="dateToExcel" />
+            <input type="button" value="Download" onclick="getSiteAnalyticsVendorSummaryExcel();" />
+        </div>
+
+
+
+        <div class="site-analytics-trybuy">
+            <label>Try/Buy requests</label>
+            <br />
+            <input type="button" value="Fetch" onclick="getCloudApplicationRequests();" />
+        </div>
+    </div>
+    <div id="siteAnalytics"></div>
+</div>
+
+@*<form id="xhidden"></form>*@
+@section scripts{
+<script type="text/javascript">
+    //$(document).ready(function () {
+        //debugger;
+
+        //var datetest = $('#datepicker');
+        $('#dateFromScreen').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#dateToScreen').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#dateFromExcel').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#dateToExcel').datepicker({ dateFormat: 'dd/mm/yy' });
+        function customAlert() {
+            alert("IN");
+        }
+
+        function getSiteAnalytics() {
+            //debugger;
+            var sessionID = $('#SessionID').val();
+            $('#siteAnalytics').empty();
+            $.getJSON('/api/siteanalytics/getsiteanalytics?sessionID=' + sessionID, function (siteAnalyticssJsonPayload) {
+                $('#siteAnalytics').append('<table>');
+                $('#siteAnalytics').append('<thead>');
+                $('#siteAnalytics').append('<td>Date</td>');
+                $('#siteAnalytics').append('<td>Action Type</td>');
+                $('#siteAnalytics').append('<td>Brand</td>');
+                $('#siteAnalytics').append('<td>Category</td>');
+                $('#siteAnalytics').append('<td>Person</td>');
+                $('#siteAnalytics').append('<td>Session</td>');
+                $('#siteAnalytics').append('</thead>');
+                $('#siteAnalytics').append('<tbody>');
+                $(siteAnalyticssJsonPayload).each(function (i, item) {
+                    //$('#siteAnalytics').append('<li>' + item.CloudApplicationID + '</li>');
+                    $('#siteAnalytics').append('<tr>');
+                    $('#siteAnalytics').append('<td>' + new Date(item.SiteAnalyticDate).toLocaleString() + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.SiteAnalyticType + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Brand + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Category + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Person + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.SessionID + '</td>');
+                    //$('#siteAnalytics').append('<td>' + new Date(parseInt(item.SiteAnalyticDate.substr(6), 10)) + '</td>');
+                    $('#siteAnalytics').append('</tr>');
+                });
+                $('#siteAnalytics').append('</tbody>');
+                $('#siteAnalytics').append('</table>');
+            });
+        }
+
+        function getSiteAnalyticsVendorSummary() {
+            var sessionID = $('#SessionID').val();
+            var vendorID = 21;
+            //debugger;
+            vendorID = $('#vendorsScreen option:selected').val();
+            var startDate = new Date();
+            var endDate = new Date();
+            startDate.setDate(endDate.getDate() - 30);
+            //debugger;
+            startDate = startDate.toJSON();
+            endDate = endDate.toJSON();
+
+            //debugger;
+            startDate = $('#dateFromScreen').datepicker('getDate').toJSON(); ;
+            endDate = $('#dateToScreen').datepicker('getDate').toJSON(); ;
+
+            //debugger;
+            //var file = $.getJSON('/api/siteanalyticsvendorsummary/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate);
+
+            $('#siteAnalytics').empty();
+            $.getJSON('/api/siteanalyticsvendorsummary/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate, function (siteAnalyticssJsonPayload) {
+                $('#siteAnalytics').append('<table>');
+                $('#siteAnalytics').append('<thead>');
+                $('#siteAnalytics').append('<td>ID</td>');
+                $('#siteAnalytics').append('<td>Service</td>');
+                $('#siteAnalytics').append('<td>Brand</td>');
+                $('#siteAnalytics').append('<td>Impressions</td>');
+                $('#siteAnalytics').append('<td>Comparison Results Impressions</td>');
+                $('#siteAnalytics').append('<td>Shop Visits</td>');
+                $('#siteAnalytics').append('<td>Shop Content Consumption</td>');
+                $('#siteAnalytics').append('<td>Shop Leads</td>');
+                $('#siteAnalytics').append('</thead>');
+                $('#siteAnalytics').append('<tbody>');
+                $(siteAnalyticssJsonPayload).each(function (i, item) {
+                    //$('#siteAnalytics').append('<li>' + item.CloudApplicationID + '</li>');
+                    $('#siteAnalytics').append('<tr>');
+                    $('#siteAnalytics').append('<td>' + item.CloudApplicationID + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ServiceName + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Brand + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Impressions + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ComparisonResultImpressions + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ShopVisits + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ShopContentConsumption + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ShopLeads + '</td>');
+                    //$('#siteAnalytics').append('<td>' + new Date(parseInt(item.SiteAnalyticDate.substr(6), 10)) + '</td>');
+                    $('#siteAnalytics').append('</tr>');
+                });
+                $('#siteAnalytics').append('</tbody>');
+                $('#siteAnalytics').append('</table>');
+            });
+        }
+
+        function getVendors() {
+            //debugger;
+            var sessionID = $('#SessionID').val();
+            $('#vendorsScreen').empty();
+            $('#vendorsExcel').empty();
+            $.getJSON('/api/vendors/getvendors', function (vendorsJsonPayload) {
+                //$('#vendors').append('<select>');
+                $(vendorsJsonPayload).each(function (i, item) {
+                    //debugger;
+                    $('#vendorsScreen').append('<option value="' + item.VendorID + '">' + item.VendorName + '</option>');
+                    $('#vendorsExcel').append('<option value="' + item.VendorID + '">' + item.VendorName + '</option>');
+
+                });
+                //$('#vendors').append('</select>');
+            });
+        }
+
+        function getSiteAnalyticsVendorSummaryExcel() {
+
+            //debugger;
+            vendorID = $('#vendorsExcel option:selected').val();
+            var startDate = new Date();
+            var endDate = new Date();
+            startDate = $('#dateFromExcel').datepicker('getDate').toJSON(); ;
+            endDate = $('#dateToExcel').datepicker('getDate').toJSON(); ;
+            var theURL = '/api/siteanalyticsvendorsummaryexcel/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate;
+
+
+            //debugger;
+
+
+            // clear hidden form
+            $('#hidden').html('');
+            $('#hidden').remove();
+
+            // post form back to Web API on the fly
+            $('<form>').attr({
+                method: 'POST',
+                id: 'hidden',
+                action: 'http://ccwebapi.wilsonmiller.co.uk/api/siteanalyticsvendorsummaryexcel/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate
+            }).appendTo('body');
+
+
+            $('#hidden').submit();
+
+            //var file = $.getJSON('/api/siteanalyticsvendorsummaryexcel/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate);
+            //            $.ajax({
+            //                url: theURL,
+            //                type: "GET",
+            //                beforeSend: function (xhr) {
+            //                    xhr.setRequestHeader("Accept", "application/vnd.ms-excel");
+            //                },
+            //                success: function (data) {
+            //                    debugger;
+            //                    //window.location.href = data;
+
+            //                },
+            //                error: function (data) {
+            //                    debugger;
+            //                }
+            //            });
+        }
+
+        function getCloudApplicationRequests() {
+            debugger;
+            vendorID = $('#vendors option:selected').val();
+            var startDate = new Date();
+            var endDate = new Date();
+
+            startDate.setDate(endDate.getDate() - 30);
+            //debugger;
+            startDate = startDate.toJSON();
+            endDate = endDate.toJSON();
+
+
+            //startDate = $('#datefrom').datepicker('getDate').toJSON(); ;
+            //endDate = $('#dateto').datepicker('getDate').toJSON(); ;
+
+            //var file = $.getJSON('/api/siteanalyticsvendorsummary/getsiteanalyticsvendorsummary?vendorID=' + vendorID + '&startDate=' + startDate + '&endDate=' + endDate);
+
+            $('#siteAnalytics').empty();
+            $.getJSON('/api/cloudapplicationrequests/getcloudapplicationrequests?startDate=' + startDate + '&endDate=' + endDate, function (siteAnalyticssJsonPayload) {
+                $('#siteAnalytics').append('<table>');
+                $('#siteAnalytics').append('<thead>');
+                $('#siteAnalytics').append('<td>Request Type</td>');
+                $('#siteAnalytics').append('<td>Forename</td>');
+                $('#siteAnalytics').append('<td>Surname</td>');
+                $('#siteAnalytics').append('<td>EMail</td>');
+                $('#siteAnalytics').append('<td>Telephone</td>');
+                $('#siteAnalytics').append('<td>Company</td>');
+                $('#siteAnalytics').append('<td>Number Of Employees</td>');
+                $('#siteAnalytics').append('<td>Position</td>');
+                $('#siteAnalytics').append('<td>Vendor</td>');
+                $('#siteAnalytics').append('<td>Brand</td>');
+                $('#siteAnalytics').append('<td>Service Name</td>');
+                $('#siteAnalytics').append('<td>Serviced</td>');
+                $('#siteAnalytics').append('<td>Servicing</td>');
+                $('#siteAnalytics').append('<td>Cloud Application Request ID</td>');
+                $('#siteAnalytics').append('<td>Person ID</td>');
+                $('#siteAnalytics').append('<td>Cloud Application ID</td>');
+                //$('#siteAnalytics').append('<td>Address#1</td>');
+                //$('#siteAnalytics').append('<td>Address#2</td>');
+                //$('#siteAnalytics').append('<td>Country</td>');
+                //$('#siteAnalytics').append('<td>PostCode</td>');
+                //$('#siteAnalytics').append('<td>Region</td>');
+                //$('#siteAnalytics').append('<td>UserName</td>');
+                $('#siteAnalytics').append('</thead>');
+                $('#siteAnalytics').append('<tbody>');
+                $(siteAnalyticssJsonPayload).each(function (i, item) {
+                    //$('#siteAnalytics').append('<li>' + item.CloudApplicationID + '</li>');
+                    $('#siteAnalytics').append('<tr>');
+                    $('#siteAnalytics').append('<td>' + item.RequestType + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Forename + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Surname + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.EMail + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Telephone + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Company + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.NumberOfEmployees + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Position + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.VendorName + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Brand + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.ServiceName + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Serviced + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.Servicing + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.CloudApplicationRequestID + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.PersonID + '</td>');
+                    $('#siteAnalytics').append('<td>' + item.CloudApplicationID + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.PersonAddress1 + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.PersonAddress2 + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.PersonCountry + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.PersonPostCode + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.PersonRegion + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.UserName + '</td>');
+                    //$('#siteAnalytics').append('<td>' + new Date(parseInt(item.SiteAnalyticDate.substr(6), 10)) + '</td>');
+                    //$('#siteAnalytics').append('<td>' + item.RequestTypeID + '</td>');
+                    $('#siteAnalytics').append('</tr>');
+                });
+                $('#siteAnalytics').append('</tbody>');
+                $('#siteAnalytics').append('</table>');
+            });
+        }
+
+
+        getVendors();
+    //});
+</script>
+}
+
+
+
